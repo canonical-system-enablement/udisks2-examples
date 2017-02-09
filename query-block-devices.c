@@ -64,7 +64,6 @@ int main(int argc, char **argv)
                 g_print("%s \n", symlinks[n]);
             g_print("\n\n");
         }
-    /* goto out */
     }
     g_list_foreach(objects, (GFunc)g_object_unref, NULL);
     g_list_free(objects);
