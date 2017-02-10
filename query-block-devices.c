@@ -27,6 +27,7 @@ int main(int argc, char **argv)
     GList *objects;
     GList *l;
     UDisksBlock *block;
+    UDisksFilesystem *fs;
 
     error = NULL;
     client = udisks_client_new_sync(NULL, &error);
@@ -57,11 +58,15 @@ int main(int argc, char **argv)
             if (label[0] != '\0')
                 g_print("Block Device Label: %s\n", label);
 
-            symlinks = udisks_block_get_symlinks(block);
-            if (symlinks[0] != NULL)
-                g_print("Block Device Symlinks: \n");
-            for (guint n = 0; symlinks != NULL & symlinks[n] != NULL; n++)
-                g_print("%s \n", symlinks[n]);
+            fs = udisks_object_peek_filesystem(object);
+            if (fs != NULL) {
+                const gchar * const *mount_points;
+                mount_points = udisks_filesystem_get_mount_points(fs);
+                if (mount_points[0] != NULL) 
+                    g_print("Mount Points: \n");
+                for (guint n = 0; mount_points != NULL & mount_points[n] != NULL; n++)
+                    g_print("%s \n", mount_points[n]);
+            }
             g_print("\n\n");
         }
     }
