@@ -29,18 +29,20 @@ int main(int argc, char **argv)
     UDisksBlock *block;
     UDisksFilesystem *fs;
 
+    /* Get a new client */
     error = NULL;
     client = udisks_client_new_sync(NULL, &error);
-
     if (client == NULL)
     {
         g_printerr("Error connecting to the udisks daemon: %s\n", error->message);
         g_error_free(error);
     }
 
+    /* Get the list of all objects managed by UDisks */
     objects = g_dbus_object_manager_get_objects(udisks_client_get_object_manager(client));
     for (l = objects; l != NULL; l = l->next)
     {
+        /* If the object is a block device we want to poke it */
         UDisksObject *object = UDISKS_OBJECT(l->data);
         block = udisks_object_peek_block(object);
         if (block != NULL)
@@ -48,21 +50,25 @@ int main(int argc, char **argv)
             const gchar *id, *label;
             const gchar * const *symlinks;
 
+            /* Print the device name */
             g_print("%s \n", udisks_block_get_device(block));
 
+            /* Print the device ID */
             id = udisks_block_get_id(block);
             if (id[0] != '\0')
                 g_print("Block Device ID: %s\n", id);
 
+            /* Print the device label */
             label = udisks_block_get_id_label(block);
             if (label[0] != '\0')
                 g_print("Block Device Label: %s\n", label);
 
+            /* Print any mount points associated withthe block device */
             fs = udisks_object_peek_filesystem(object);
             if (fs != NULL) {
                 const gchar * const *mount_points;
                 mount_points = udisks_filesystem_get_mount_points(fs);
-                if (mount_points[0] != NULL) 
+                if (mount_points[0] != NULL)
                     g_print("Mount Points: \n");
                 for (guint n = 0; mount_points != NULL & mount_points[n] != NULL; n++)
                     g_print("%s \n", mount_points[n]);
