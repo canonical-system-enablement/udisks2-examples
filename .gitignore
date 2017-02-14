@@ -1,0 +1,4 @@
+.*.swp
+.*.swo
+query-block-devices
+detect-hotplug
