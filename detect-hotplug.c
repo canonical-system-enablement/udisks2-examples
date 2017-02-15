@@ -16,6 +16,7 @@
  *
  */
 
+#include <string.h>
 #include <udisks/udisks.h>
 
 static UDisksClient *client = NULL;
@@ -30,22 +31,33 @@ static void on_object_added(GDBusObjectManager *manager,
     UDisksBlock *block = udisks_object_peek_block(object);
     if (block != NULL)
     {
-        const gchar *id, *label;
+        const gchar *device, *drive, *id, *label;
         const gchar * const *symlinks;
 
+        device = udisks_block_get_device(block);
+        if (device == NULL)
+            return;
+
+        /* Only print block devices backed by a drive */
+        drive = udisks_block_get_drive(block);
+        if (drive == NULL || g_strcmp0(drive, "/") == 0)
+            return;
+
         g_print("New block device added:\n");
-        /* Print the device name */
-        g_print("%s \n", udisks_block_get_device(block));
+
+        /* Print the device details */
+        g_print("device path : %s\n", device);
+        g_print("device drive: %s\n", drive);
 
         /* Print the device ID */
         id = udisks_block_get_id(block);
-        if (id[0] != '\0')
-            g_print("Block Device ID: %s\n", id);
+        if (id && strlen(id))
+            g_print("device ID: %s\n", id);
 
         /* Print the device label */
         label = udisks_block_get_id_label(block);
-        if (label[0] != '\0')
-            g_print("Block Device Label: %s\n", label);
+        if (label && strlen(label))
+            g_print("device label: %s\n", label);
 
         /* Print any mount points associated withthe block device */
         UDisksFilesystem *fs = udisks_object_peek_filesystem(object);
@@ -53,11 +65,11 @@ static void on_object_added(GDBusObjectManager *manager,
             const gchar * const *mount_points;
             mount_points = udisks_filesystem_get_mount_points(fs);
             if (mount_points[0] != NULL)
-                g_print("Mount Points: \n");
+                g_print("device mount points: \n");
             for (guint n = 0; mount_points != NULL & mount_points[n] != NULL; n++)
                 g_print("%s \n", mount_points[n]);
         }
-        g_print("\n\n");
+        g_print("---\n");
     }
 }
 
