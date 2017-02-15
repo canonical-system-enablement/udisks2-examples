@@ -1,0 +1,23 @@
+name: udisks2-examples
+version: '0.1'
+summary: Example code for interfacing with udisks2
+description: |
+    Example code for interfacing with udisks2
+    .
+    Find the source for this snap at https://github.com/canonical-system-enablement/udisks2-examples
+
+grade: devel
+confinement: strict
+
+apps:
+    query-block-devices:
+        command: bin/query-block-devices
+        plugs: [udisks2]
+    detect-hotplug:
+        command: bin/detect-hotplug
+        plugs: [udisks2]
+
+parts:
+  udisks2-examples:
+    plugin: make
+    source: .

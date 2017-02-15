@@ -7,6 +7,9 @@ query-block-devices: query-block-devices.c
 
 detect-hotplug: detect-hotplug.c
 	$(CC) detect-hotplug.c -o detect-hotplug `pkg-config --cflags --libs udisks2`
+install: query-block-devices detect-hotplug
+	install -d ${DESTDIR}/bin/
+	install -t ${DESTDIR}/bin/ -m755 query-block-devices detect-hotplug
 
 clean:
 	rm query-block-devices detect-hotplug
