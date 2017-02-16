@@ -98,6 +98,34 @@ static void on_object_removed(GDBusObjectManager *manager,
     }
 }
 
+static void on_interface_proxy_properties_changed (GDBusObjectManagerClient *manager,
+                                                   GDBusObjectProxy         *object_proxy,
+                                                   GDBusProxy               *interface_proxy,
+                                                   GVariant                 *changed_properties,
+                                                   const gchar* const       *invalidated_properties,
+                                                   gpointer                  user_data)
+{
+    GVariantIter *iter;
+    const gchar *property_name;
+    GVariant *value;
+
+    g_variant_get (changed_properties, "a{sv}", &iter);
+    while (g_variant_iter_next(iter, "{&sv}", &property_name, &value)) {
+        /* We only care about mount points */
+        if (g_strcmp0(property_name, "MountPoints") != 0)
+            continue;
+
+        gchar *value_str;
+        value_str = g_variant_print(value, FALSE);
+
+        g_print("Mount points changed for %s\nNew values:\n %s\n",
+                g_dbus_object_get_object_path(G_DBUS_OBJECT(object_proxy)),
+                value_str);
+    }
+
+    g_print("---\n");
+}
+
 int main(int argc, char **argv)
 {
     GError *error;
@@ -124,6 +152,10 @@ int main(int argc, char **argv)
     g_signal_connect(manager,
                      "object-removed",
                      G_CALLBACK(on_object_removed),
+                     NULL);
+    g_signal_connect(manager,
+                     "interface-proxy-properties-changed",
+                     G_CALLBACK(on_interface_proxy_properties_changed),
                      NULL);
 
     /* Wait for events to come in */
