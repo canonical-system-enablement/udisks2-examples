@@ -24,7 +24,7 @@ static GMainLoop *loop = NULL;
 
 static void on_object_added(GDBusObjectManager *manager,
                             GDBusObject *obj,
-                            gpointer *user_data)
+                            gpointer user_data)
 {
     /* If the object is a block device show some info about it */
     UDisksObject *object = UDISKS_OBJECT(obj);
@@ -75,14 +75,26 @@ static void on_object_added(GDBusObjectManager *manager,
 
 static void on_object_removed(GDBusObjectManager *manager,
                               GDBusObject *obj,
-                              gpointer *user_data)
+                              gpointer user_data)
 {
-    /* If the object is a block device name it */
     UDisksObject *object = UDISKS_OBJECT(obj);
     UDisksBlock *block = udisks_object_peek_block(object);
     if (block != NULL)
     {
-        g_print("%s Removed.\n", udisks_block_get_device(block));
+        const gchar *device, *drive, *id, *label;
+        const gchar * const *symlinks;
+
+        device = udisks_block_get_device(block);
+        if (device == NULL)
+            return;
+
+        /* Only print block devices backed by a drive */
+        drive = udisks_block_get_drive(block);
+        if (drive == NULL || g_strcmp0(drive, "/") == 0)
+            return;
+
+        g_print("Block device removed: %s\n", device);
+        g_print("---\n");
     }
 }
 
