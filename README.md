@@ -24,3 +24,9 @@ Detect when a device such as a USB thumb drive is plugged into or removed from y
 ```
 $ ./detect-hotplug
 ```
+
+### probe-usb-devices
+List info about the USB-attached storage on your system
+```
+$ ./probe-usb-devices
+```

@@ -16,6 +16,9 @@ apps:
     detect-hotplug:
         command: bin/detect-hotplug
         plugs: [udisks2]
+    probe-usb-devices:
+        command: bin/probe-usb-devices
+        plugs: [udisks2]
 
 parts:
   udisks2-examples:
