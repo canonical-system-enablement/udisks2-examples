@@ -23,4 +23,9 @@ apps:
 parts:
   udisks2-examples:
     plugin: make
+    build-packages:
+        - build-essential
+        - libglib2.0-dev
+        - libudisks2-dev
+        - pkg-config
     source: .
