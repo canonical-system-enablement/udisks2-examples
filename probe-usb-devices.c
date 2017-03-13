@@ -61,6 +61,14 @@ int main(int argc, char **argv)
             if (drive_str == NULL || g_strcmp0(drive_str, "/") == 0)
                 continue;
 
+            /* If udisks says to ignore a block device then do so */
+            if (udisks_block_get_hint_ignore(block))
+                continue;
+
+            /* Exclude system disks */
+            if (udisks_block_get_hint_system(block))
+                continue;
+
             /* Check if there's a USB-backed drive associated with this
              * object
              */
@@ -76,31 +84,33 @@ int main(int argc, char **argv)
                     if (!removable || g_strcmp0(bus, "usb") != 0)
                         continue;
 
-                /* Print the device details */
-                g_print("device path : %s\n", device);
-                g_print("device drive: %s\n", drive_str);
+                 
 
-                /* Print the device ID */
-                id = udisks_block_get_id(block);
-                if (id && strlen(id))
-                    g_print("device id   : %s\n", id);
+                    /* Print the device details */
+                    g_print("device path : %s\n", device);
+                    g_print("device drive: %s\n", drive_str);
 
-                /* Print the device label */
-                label = udisks_block_get_id_label(block);
-                if (label && strlen(label))
-                    g_print("device label: %s\n", label);
+                    /* Print the device ID */
+                    id = udisks_block_get_id(block);
+                    if (id && strlen(id))
+                        g_print("device id   : %s\n", id);
 
-                /* Print any mount points associated withthe block device */
-                fs = udisks_object_peek_filesystem(object);
-                if (fs != NULL) {
-                    const gchar * const *mount_points;
-                    mount_points = udisks_filesystem_get_mount_points(fs);
-                    if (mount_points[0] != NULL)
-                        g_print("device mount points: \n");
-                    for (guint n = 0; mount_points != NULL & mount_points[n] != NULL; n++)
-                        g_print("%s \n", mount_points[n]);
-                }
-                g_print("---\n");
+                    /* Print the device label */
+                    label = udisks_block_get_id_label(block);
+                    if (label && strlen(label))
+                        g_print("device label: %s\n", label);
+
+                    /* Print any mount points associated withthe block device */
+                    fs = udisks_object_peek_filesystem(object);
+                    if (fs != NULL) {
+                        const gchar * const *mount_points;
+                        mount_points = udisks_filesystem_get_mount_points(fs);
+                        if (mount_points[0] != NULL)
+                            g_print("device mount points: \n");
+                        for (guint n = 0; mount_points != NULL & mount_points[n] != NULL; n++)
+                            g_print("%s \n", mount_points[n]);
+                    }
+                    g_print("---\n");
 
                 }
             }
