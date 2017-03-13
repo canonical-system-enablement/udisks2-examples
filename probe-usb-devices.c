@@ -84,8 +84,6 @@ int main(int argc, char **argv)
                     if (!removable || g_strcmp0(bus, "usb") != 0)
                         continue;
 
-                 
-
                     /* Print the device details */
                     g_print("device path : %s\n", device);
                     g_print("device drive: %s\n", drive_str);
